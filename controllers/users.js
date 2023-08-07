@@ -11,7 +11,7 @@ module.exports.getUser = (req, res) => {
   User.findById(req.params.userId)
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err instanceof mongoose.Error.DocumentNotFoundError) {
+      if (err instanceof mongoose.Error.CastError) {
         res.status(404).send({ message: ' Пользователь по указанному _id не найден' });
       } else {
         res.status(500).send({ message: 'Произошла ошибка' });
@@ -23,10 +23,9 @@ module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
-    .orFail()
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err instanceof mongoose.Error.CastError) {
+      if (err instanceof mongoose.Error.ValidationError) {
         res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя' });
       } else {
         res.status(500).send({ message: 'Произошла ошибка' });
@@ -48,12 +47,11 @@ module.exports.updateUser = (req, res) => {
       runValidators: true,
     },
   )
-    .orFail()
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err instanceof mongoose.Error.CastError) {
+      if (err instanceof mongoose.Error.ValidationError) {
         res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля' });
-      } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
+      } else if (err instanceof mongoose.Error.CastError) {
         res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
       } else {
         res.status(500).send({ message: 'Произошла ошибка' });
@@ -72,12 +70,11 @@ module.exports.updateAvatar = (req, res) => {
       runValidators: true,
     },
   )
-    .orFail()
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err instanceof mongoose.Error.CastError) {
+      if (err instanceof mongoose.Error.ValidationError) {
         res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара' });
-      } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
+      } else if (err instanceof mongoose.Error.CastError) {
         res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
       } else {
         res.status(500).send({ message: 'Произошла ошибка' });

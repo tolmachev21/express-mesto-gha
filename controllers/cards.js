@@ -3,7 +3,6 @@ const Card = require('../models/card');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
-    .orFail()
     .then((cards) => res.send({ data: cards }))
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
@@ -14,7 +13,7 @@ module.exports.createCard = (req, res) => {
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      if (err instanceof mongoose.Error.CastError) {
+      if (err instanceof mongoose.Error.ValidationError) {
         res.status(400).send({ message: 'Переданы некорректные данные при создании карточки' });
       } else {
         res.status(500).send({ message: 'Произошла ошибка' });
@@ -41,7 +40,7 @@ module.exports.putLike = (req, res) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
         res.status(400).send({ message: 'Переданы некорректные данные для постановки лайка' });
-      } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
+      } else if (err instanceof mongoose.Error.ValidationError) {
         res.status(404).send({ message: 'Передан несуществующий _id карточки' });
       } else {
         res.status(500).send({ message: 'Произошла ошибка' });
@@ -61,7 +60,7 @@ module.exports.deleteLike = (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        res.status(400).send({ messgae: 'Переданы некорректные данные для снятии лайка' });
+        res.status(400).send({ message: 'Переданы некорректные данные для снятии лайка' });
       } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
         res.status(404).send({ message: 'Передан несуществующий _id карточки' });
       } else {
