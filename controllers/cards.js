@@ -23,8 +23,15 @@ module.exports.createCard = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
+    .orFail()
     .then((card) => res.send({ data: card }))
-    .catch(() => res.status(404).send({ message: 'Карточка с указанным _id не найдена' }));
+    .catch((err) => {
+      if (err instanceof mongoose.Error.CastError) {
+        res.status(400).send({ message: 'Передан некорректный _id карточки' });
+      } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
+        res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
+      }
+    });
 };
 
 module.exports.putLike = (req, res) => {
@@ -36,11 +43,12 @@ module.exports.putLike = (req, res) => {
       runValidators: true,
     },
   )
+    .orFail()
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        res.status(400).send({ message: 'Переданы некорректные данные для постановки лайка' });
-      } else if (err instanceof mongoose.Error.ValidationError) {
+        res.status(400).send({ message: 'Передан некорректный _id карточки для постановки лайка' });
+      } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
         res.status(404).send({ message: 'Передан несуществующий _id карточки' });
       } else {
         res.status(500).send({ message: 'Произошла ошибка' });
@@ -57,10 +65,11 @@ module.exports.deleteLike = (req, res) => {
       runValidators: true,
     },
   )
+    .orFail()
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        res.status(400).send({ message: 'Переданы некорректные данные для снятии лайка' });
+        res.status(400).send({ message: 'Передан некорректный _id карточки для снятии лайка' });
       } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
         res.status(404).send({ message: 'Передан несуществующий _id карточки' });
       } else {

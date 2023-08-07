@@ -9,9 +9,12 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.getUser = (req, res) => {
   User.findById(req.params.userId)
+    .orFail()
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
+        res.status(400).send({ message: 'Передан некорректный _id пользователя' });
+      } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
         res.status(404).send({ message: ' Пользователь по указанному _id не найден' });
       } else {
         res.status(500).send({ message: 'Произошла ошибка' });
