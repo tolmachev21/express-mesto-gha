@@ -52,7 +52,7 @@ module.exports.createUser = (req, res, next) => {
     .then((newUser) => {
       User.findById(newUser)
         .then((cretedUser) => {
-          res.status(httpConstants.HTTP_STATUS_CREATED).send(cretedUser);
+          res.status(httpConstants.HTTP_STATUS_CREATED).send({ data: cretedUser });
         });
     })
     .catch((err) => {
