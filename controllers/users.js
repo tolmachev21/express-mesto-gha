@@ -47,12 +47,12 @@ module.exports.createUser = (req, res, next) => {
         avatar,
         email,
         password: hash,
-      });
-    })
-    .then((newUser) => {
-      User.findById(newUser)
-        .then((cretedUser) => {
-          res.status(httpConstants.HTTP_STATUS_CREATED).send({ data: cretedUser });
+      })
+        .then((newUser) => {
+          User.findById(newUser)
+            .then((cretedUser) => {
+              res.status(httpConstants.HTTP_STATUS_CREATED).send(cretedUser);
+            });
         });
     })
     .catch((err) => {
