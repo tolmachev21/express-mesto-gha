@@ -40,15 +40,20 @@ module.exports.createUser = (req, res, next) => {
   } = req.body;
 
   bcrypt.hash(password, 10)
-    .then((hash) => User.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash,
-    }))
-    .then(({ _id }) => {
-      res.status(httpConstants.HTTP_STATUS_CREATED).send({ id: _id });
+    .then((hash) => {
+      User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash,
+      });
+    })
+    .then((newUser) => {
+      User.findById(newUser)
+        .then((cretedUser) => {
+          res.status(httpConstants.HTTP_STATUS_CREATED).send(cretedUser);
+        });
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
