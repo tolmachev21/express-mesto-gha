@@ -55,25 +55,24 @@ module.exports.createUser = (req, res, next) => {
   } = req.body;
 
   bcrypt.hash(password, 10)
-    .orFail(next(new ConflictError('Такого пользователя не существует')))
-    .then((hash) => {
-      User.create({
-        name,
-        about,
-        avatar,
-        email,
-        password: hash,
-      })
-        .then((newUser) => {
-          User.findById(newUser)
-            .then((cretedUser) => {
-              res.status(httpConstants.HTTP_STATUS_CREATED).send(cretedUser);
-            });
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
+    .then((newUser) => {
+      User.findById(newUser)
+        .then((cretedUser) => {
+          res.status(httpConstants.HTTP_STATUS_CREATED).send(cretedUser);
         });
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
+      } else if (err.code === 11000) {
+        next(new ConflictError('Такой пользователь уже зарегистрирован'));
       } else {
         next(err);
       }
