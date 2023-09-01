@@ -31,6 +31,7 @@ module.exports.deleteCard = (req, res, next) => {
   Card.findById(card)
     .orFail()
     .then((findCard) => {
+      // eslint-disable-next-line eqeqeq
       if (findCard.owner == req.user._id) {
         findCard.deleteOne();
         res.send({ data: findCard });
