@@ -55,6 +55,7 @@ module.exports.createUser = (req, res, next) => {
   } = req.body;
 
   bcrypt.hash(password, 10)
+    .orFail(next(new ConflictError('Такого пользователя не существует')))
     .then((hash) => {
       User.create({
         name,
@@ -73,8 +74,6 @@ module.exports.createUser = (req, res, next) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
-      } else if (err.code === 11000) {
-        next(new ConflictError('Такого пользователя не существует'));
       } else {
         next(err);
       }

@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, 'Это обязательное поле!'],
-    unique: [true, 'Пользователь с данной почтой уже существует!'],
+    unique: true,
     validate: {
       validator(v) {
         return isEmail(v);
