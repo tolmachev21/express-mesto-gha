@@ -29,6 +29,7 @@ module.exports.createCard = (req, res, next) => {
 module.exports.deleteCard = (req, res, next) => {
   const card = req.params.cardId;
   Card.findById(card)
+    .orFail()
     .then((findCard) => {
       // eslint-disable-next-line eqeqeq
       if (findCard.owner == req.user._id) {
@@ -42,7 +43,7 @@ module.exports.deleteCard = (req, res, next) => {
       if (err instanceof mongoose.Error.CastError) {
         next(new BadRequestError('Передан некорректный _id карточки'));
       } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        next(NotFoundError('Карточка с указанным _id не найдена'));
+        next(new NotFoundError('Карточка с указанным _id не найдена'));
       }
     });
 };
