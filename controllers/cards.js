@@ -31,10 +31,9 @@ module.exports.deleteCard = (req, res, next) => {
   Card.findById(card)
     .orFail()
     .then((findCard) => {
-      // eslint-disable-next-line eqeqeq
       if (findCard.owner == req.user._id) {
-        Card.findByIdAndRemove(findCard)
-          .then((removeCard) => res.send({ data: removeCard }));
+        findCard.deleteOne();
+        res.send({ data: findCard });
       } else {
         next(new ForbiddenError('Недостаточно прав для удаления карточки'));
       }

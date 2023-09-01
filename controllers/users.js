@@ -64,6 +64,7 @@ module.exports.createUser = (req, res, next) => {
     }))
     .then((newUser) => {
       User.findById(newUser)
+        .orFail()
         .then((cretedUser) => {
           res.status(httpConstants.HTTP_STATUS_CREATED).send(cretedUser);
         });
