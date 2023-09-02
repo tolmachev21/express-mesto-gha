@@ -62,9 +62,9 @@ module.exports.createUser = (req, res, next) => {
       email,
       password: hash,
     }))
+    // eslint-disable-next-line arrow-body-style
     .then((newUser) => {
-      User.findById(newUser)
-        .orFail()
+      return User.findById(newUser)
         .then((cretedUser) => {
           res.status(httpConstants.HTTP_STATUS_CREATED).send(cretedUser);
         });
